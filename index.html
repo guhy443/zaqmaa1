@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zama Daily Quiz – Day 14</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1f1c2c, #928DAB);
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .container {
+      max-width: 600px;
+      margin: 80px auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+    h1 {
+      margin-bottom: 10px;
+      font-size: 28px;
+      letter-spacing: 1px;
+    }
+    button {
+      background: #ff5f6d;
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      margin: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    button:hover { background: #ffc371; color: #222; }
+    .option {
+      display: block;
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      margin: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .option:hover { background: rgba(255,255,255,0.4); }
+    .correct { background: #28a745 !important; }
+    .wrong { background: #dc3545 !important; }
+    #timer {
+      font-size: 18px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Zama Daily Quiz 🔐</h1>
+    <p id="timer">Timer: <span id="time">10</span>s</p>
+    <div id="quiz"></div>
+    <button id="nextBtn" style="display:none;">Next ➡️</button>
+    <button id="startBtn">Start Quiz 🚀</button>
+  </div>
+
+  <script>
+    const quizData = [
+      { question: "What does FHE enable developers to do?", options: ["Compute on encrypted data without decrypting", "Encrypt only passwords", "Decrypt data faster", "Compress large files"], answer: 0 },
+      { question: "Which Zama library focuses on machine learning with FHE?", options: ["Concrete ML", "TFHE-rs", "PyTorch", "NumPy"], answer: 0 },
+      { question: "Zama’s TFHE-rs library is written in which language?", options: ["Rust", "Python", "Java", "C++"], answer: 0 },
+      { question: "What is the key benefit of FHE for blockchain apps?", options: ["Enables confidential smart contracts", "Increases transaction fees", "Makes data public", "Speeds up mining"], answer: 0 },
+      { question: "Who can participate in the Zama Creator Program?", options: ["Anyone who creates educational FHE content", "Only developers", "Only investors", "Only employees"], answer: 0 },
+      { question: "Zama OG NFTs provide:", options: ["Community recognition & alpha access", "Mining rewards", "Token staking", "Trading privileges"], answer: 0 },
+      { question: "Which of the following is NOT a Zama library?", options: ["Concrete", "FHEVM", "TensorFlow", "TFHE-rs"], answer: 2 },
+      { question: "What is the ultimate vision of Zama?", options: ["Make privacy the default in blockchain & AI", "Create a metaverse", "Build an NFT marketplace", "Launch a new token"], answer: 0 },
+      { question: "How does FHE protect user data?", options: ["Keeps data encrypted during computation", "Deletes the data", "Stores it offline", "Sends it to multiple servers"], answer: 0 },
+      { question: "What does FHEVM stand for?", options: ["Fully Homomorphic Encrypted Virtual Machine", "Fast Hybrid Encryption Virtual Machine", "Functional Hash Execution Model", "Flexible Homomorphic Engine"], answer: 0 }
+    ];
+
+    let currentQuiz = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 10;
+
+    const quizEl = document.getElementById('quiz');
+    const nextBtn = document.getElementById('nextBtn');
+    const startBtn = document.getElementById('startBtn');
+    const timeEl = document.getElementById('time');
+    const timerBox = document.getElementById('timer');
+
+    startBtn.addEventListener('click', startQuiz);
+    nextBtn.addEventListener('click', () => {
+      currentQuiz++;
+      if (currentQuiz < quizData.length) loadQuiz();
+      else showResult();
+    });
+
+    function startQuiz() {
+      startBtn.style.display = 'none';
+      loadQuiz();
+    }
+
+    function loadQuiz() {
+      clearInterval(timer);
+      timeLeft = 10;
+      timerBox.style.display = "block";
+      nextBtn.style.display = 'none';
+      const q = quizData[currentQuiz];
+      quizEl.innerHTML = `<h2>${q.question}</h2>` + q.options.map((opt, i) =>
+        `<div class='option' onclick='selectOption(${i})'>${opt}</div>`
+      ).join('');
+      startTimer();
+    }
+
+    function startTimer() {
+      timeEl.innerText = timeLeft;
+      timer = setInterval(() => {
+        timeLeft--;
+        timeEl.innerText = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          disableOptions();
+          nextBtn.style.display = 'block';
+        }
+      }, 1000);
+    }
+
+    function selectOption(selected) {
+      clearInterval(timer);
+      const q = quizData[currentQuiz];
+      const options = document.querySelectorAll('.option');
+      options.forEach((opt, i) => {
+        opt.style.pointerEvents = 'none';
+        if (i === q.answer) opt.classList.add('correct');
+        else if (i === selected && i !== q.answer) opt.classList.add('wrong');
+      });
+      if (selected === q.answer) score++;
+      nextBtn.style.display = 'block';
+    }
+
+    function disableOptions() {
+      document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+    }
+
+    function showResult() {
+      quizEl.innerHTML = `<h2>🎉 You scored ${score}/${quizData.length}!</h2><p>Thanks for playing the Zama Daily Quiz 🔐</p>`;
+      timerBox.style.display = 'none';
+      nextBtn.style.display = 'none';
+      startBtn.innerText = "Play Again 🔁";
+      startBtn.style.display = 'block';
+      startBtn.onclick = () => location.reload();
+    }
+  </script>
+</body>
+</html>
